@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    private static final int FINISH_COMMAND = 6;
+
     public static void main(String[] args) {
         PetRepository petRepository = new PetRepository();
         PackAnimalRepository packAnimalRepository = new PackAnimalRepository();
@@ -27,55 +29,55 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         int command = 0;
-        while (command != 5) {
+        while (command != FINISH_COMMAND) {
             try {
                 command = askCommand(sc);
+
+                switch (command) {
+                    case 1 -> {
+                        for (PetModel pet : animalSvc.listPets()) {
+                            System.out.println(pet);
+                        }
+                    }
+                    case 2 -> {
+                        for (PackAnimalModel packAnimal : animalSvc.listPackAnimals()) {
+                            System.out.println(packAnimal);
+                        }
+                    }
+                    case 3 -> {
+                        try {
+                            addAnimal(sc, animalSvc);
+                        } catch (InvalidBirthDateFormat e) {
+                            System.out.println("Invalid birth date format");
+                        } catch (InvalidAnimalType e) {
+                            System.out.println("Invalid animal type");
+                        } catch (InvalidPropertiesFormatException e) {
+                            System.out.println("Invalid property format: " + e.getMessage());
+                        }
+                    }
+                    case 4 -> {
+                        try {
+                            addCommand(sc, animalSvc);
+                        } catch (InvalidIDFormat e) {
+                            System.out.println("Enter a valid animal id");
+                        } catch (AnimalNotFound e) {
+                            System.out.println("Animal not found");
+                        } catch (InvalidPropertiesFormatException e) {
+                            System.out.println("Invalid property format: " + e.getMessage());
+                        }
+                    }
+                    case 5 -> System.out.println("animals number: " + animalSvc.animalsCount());
+                    case FINISH_COMMAND -> {
+                        // exit from the app
+                    }
+                    default -> System.out.println("Command not found");
+                }
             } catch (InvalidIDFormat ignore) {
                 System.out.println("Enter a valid command id");
             }
 
-            switch (command) {
-                case 1 -> {
-                    for (PetModel pet : animalSvc.listPets()) {
-                        System.out.println(pet);
-                    }
-                }
-                case 2 -> {
-                    for (PackAnimalModel packAnimal : animalSvc.listPackAnimals()) {
-                        System.out.println(packAnimal);
-                    }
-                }
-                case 3 -> {
-                    try {
-                        addAnimal(sc, animalSvc);
-                    } catch (InvalidBirthDateFormat e) {
-                        System.out.println("Invalid birth date format");
-                    } catch (InvalidAnimalType e) {
-                        System.out.println("Invalid animal type");
-                    } catch (InvalidPropertiesFormatException e) {
-                        System.out.println("Invalid property format: " + e.getMessage());
-                    }
-                }
-                case 4 -> {
-                    try {
-                        addCommand(sc, animalSvc);
-                    } catch (InvalidIDFormat e) {
-                        System.out.println("Enter a valid animal id");
-                    } catch (AnimalNotFound e) {
-                        System.out.println("Animal not found");
-                    } catch (InvalidPropertiesFormatException e) {
-                        System.out.println("Invalid property format: " + e.getMessage());
-                    }
-                }
-                case 5 -> {
-                    // exit from the app
-                }
-                default -> System.out.println("Command not found");
-            }
-
             System.out.println("----------------------------------------");
         }
-
     }
 
     private static int askCommand(Scanner sc) throws InvalidIDFormat {
@@ -85,7 +87,8 @@ public class Main {
                 2. List pack animals
                 3. Add a new animal
                 4. Teach animal to the new commands
-                5. Exit""");
+                5. Show number of animals
+                6. Exit""");
 
         System.out.print("Enter the command: ");
         try {
@@ -93,6 +96,7 @@ public class Main {
             sc.nextLine();
             return command;
         } catch (Exception e) {
+            sc.nextLine();
             throw new InvalidIDFormat();
         }
     }
@@ -145,6 +149,7 @@ public class Main {
             id = sc.nextInt() - 1;
             sc.nextLine();
         } catch (Exception e) {
+            sc.nextLine();
             throw new InvalidIDFormat();
         }
 
